@@ -37,9 +37,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>assignment1</module>
-        <module>assignment2</module>
         <module>assignment3</module>
+        <module>assignment4</module>
     </modules>
 
     <properties>
