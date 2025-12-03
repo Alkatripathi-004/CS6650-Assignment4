@@ -25,10 +25,14 @@ public class MetricsController {
             @RequestParam(required = false) String start,
             @RequestParam(required = false) String end) {
 
-        String endTime = (end != null) ? end : Instant.now().toString();
-        String startTime = (start != null) ? start : Instant.now().minus(1, ChronoUnit.HOURS).toString();
-
-        return queryService.getRoomHistory(roomId, startTime, endTime);
+        if (end == null) {
+            // Truncate to minutes (e.g., 10:05:00 instead of 10:05:23.456)
+            end = Instant.now().truncatedTo(ChronoUnit.MINUTES).toString();
+        }
+        if (start == null) {
+            start = Instant.now().truncatedTo(ChronoUnit.MINUTES).minus(1, ChronoUnit.HOURS).toString();
+        }
+        return queryService.getRoomHistory(roomId, start, end);
     }
 
     @GetMapping("/user/{userId}")
@@ -44,19 +48,25 @@ public class MetricsController {
     }
 
     @GetMapping("/active-users")
-    public CompletableFuture<Map<String, Object>> getActiveUserCount(
+    public Map<String, Object> getActiveUserCount(
             @RequestParam(required = false) String start,
             @RequestParam(required = false) String end) {
 
-        String endTime = (end != null) ? end : Instant.now().toString();
-        String startTime = (start != null) ? start : Instant.now().minus(1, ChronoUnit.HOURS).toString();
+        if (end == null) {
+            // Truncate to minutes (e.g., 10:05:00 instead of 10:05:23.456)
+            end = Instant.now().truncatedTo(ChronoUnit.MINUTES).toString();
+        }
+        if (start == null) {
+            start = Instant.now().truncatedTo(ChronoUnit.MINUTES).minus(1, ChronoUnit.HOURS).toString();
+        }
 
-        return queryService.getAnalyticsInWindow(startTime, endTime)
-                .thenApply(stats -> Map.of(
-                        "window_start", stats.get("window_start"),
-                        "window_end", stats.get("window_end"),
-                        "unique_active_users", stats.get("unique_active_users")
-                ));
+        Map<String, Object> stats = queryService.getAnalyticsInWindow(start, end);
+
+        return Map.of(
+                "window_start", stats.get("window_start"),
+                "window_end", stats.get("window_end"),
+                "unique_active_users", stats.get("unique_active_users")
+        );
     }
 
 
@@ -66,13 +76,18 @@ public class MetricsController {
     }
 
     @GetMapping("/stats")
-    public CompletableFuture<Map<String, Object>> getSystemStats(
+    public Map<String, Object> getSystemStats(
             @RequestParam(required = false) String start,
             @RequestParam(required = false) String end) {
 
-        String endTime = (end != null) ? end : Instant.now().toString();
-        String startTime = (start != null) ? start : Instant.now().minus(1, ChronoUnit.HOURS).toString();
+        if (end == null) {
+            // Truncate to minutes (e.g., 10:05:00 instead of 10:05:23.456)
+            end = Instant.now().truncatedTo(ChronoUnit.MINUTES).toString();
+        }
+        if (start == null) {
+            start = Instant.now().truncatedTo(ChronoUnit.MINUTES).minus(1, ChronoUnit.HOURS).toString();
+        }
 
-        return queryService.getAnalyticsInWindow(startTime, endTime);
+        return queryService.getAnalyticsInWindow(start, end);
     }
 }

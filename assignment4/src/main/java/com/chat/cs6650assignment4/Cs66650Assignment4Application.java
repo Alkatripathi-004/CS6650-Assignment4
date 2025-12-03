@@ -10,10 +10,10 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableRetry
 @EnableCaching
 @EnableAsync
-public class Cs66650Assignment3Application {
+public class Cs66650Assignment4Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(Cs66650Assignment3Application.class, args);
+		SpringApplication.run(Cs66650Assignment4Application.class, args);
 	}
 
 }

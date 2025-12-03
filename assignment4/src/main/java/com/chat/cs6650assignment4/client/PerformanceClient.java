@@ -18,18 +18,18 @@ import java.util.stream.Collectors;
 
 public class PerformanceClient {
 
-    private static final String SERVER_WS_URL = "PLACEHOLDER_WS_URL";
-    private static final String SERVER_HTTP_URL = "PLACEHOLDER_HTTP_URL";
+    private static final String SERVER_WS_URL = "ws://chatApp-alb-1310782362.us-east-1.elb.amazonaws.com/chat";
+    private static final String SERVER_HTTP_URL = "http://chatApp-alb-1310782362.us-east-1.elb.amazonaws.com";
 
-    private static int NUM_THREADS = 256;
-    private static double RATE_LIMIT_PER_SECOND = 1000;
-    private static int TOTAL_MESSAGES = 1500000;
+    private static int NUM_THREADS = 64;
+    private static double RATE_LIMIT_PER_SECOND = 150;
+    private static int TOTAL_MESSAGES = 5000;
 
     public static final ChatMessage POISON_PILL = new ChatMessage();
     private static final int MESSAGE_QUEUE_CAPACITY = 30000;
 
     public static void main(String[] args) {
-        System.out.println("\n=========== STARTING PERFORMANCE TEST (ASSIGNMENT 3) ===========");
+        System.out.println("\n=========== STARTING PERFORMANCE TEST (ASSIGNMENT 4) ===========");
         System.out.printf("Configuration: WS_URL=%s, HTTP_URL=%s%n", SERVER_WS_URL, SERVER_HTTP_URL);
         System.out.printf("Threads=%d, Messages=%d, Rate Limit=%.2f/s%n", NUM_THREADS, TOTAL_MESSAGES, RATE_LIMIT_PER_SECOND);
 
@@ -99,7 +99,7 @@ public class PerformanceClient {
     private static void runAnalyticsVerification() {
         System.out.println("\n--- PHASE 2: ANALYTICS & PERSISTENCE VERIFICATION ---");
         System.out.println("Waiting 30 seconds to allow Write-Behind buffer to flush to DynamoDB...");
-        try { Thread.sleep(10000); } catch (InterruptedException e) {}
+        try { Thread.sleep(30000); } catch (InterruptedException e) {}
 
         HttpClient httpClient = HttpClient.newHttpClient();
         ObjectMapper mapper = new ObjectMapper();

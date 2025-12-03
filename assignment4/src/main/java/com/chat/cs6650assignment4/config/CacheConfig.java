@@ -1,28 +1,36 @@
 package com.chat.cs6650assignment4.config;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @EnableCaching
 public class CacheConfig {
 
     @Bean
-    public CacheManager cacheManager() {
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
+    public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+        // Default Configuration: 10 Seconds TTL
+        // This applies to roomHistory, userHistory, userRooms
+        RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofSeconds(10))
+                .disableCachingNullValues();
 
-        cacheManager.setAsyncCacheMode(true);
+        // Optional: Specific configuration for Analytics if you want it longer
+        Map<String, RedisCacheConfiguration> configMap = new HashMap<>();
+        configMap.put("analyticsCache", defaultConfig.entryTtl(Duration.ofSeconds(30))); // Keep analytics for 30s
 
-        cacheManager.setCaffeine(Caffeine.newBuilder()
-                .expireAfterWrite(10, TimeUnit.SECONDS)
-                .maximumSize(100));
-
-        return cacheManager;
+        return RedisCacheManager.builder(connectionFactory)
+                .cacheDefaults(defaultConfig)
+                .withInitialCacheConfigurations(configMap)
+                .build();
     }
 }
