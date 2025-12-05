@@ -22,8 +22,8 @@ public class DynamoDBConfig {
                 .region(Region.of(region))
                 .credentialsProvider(DefaultCredentialsProvider.create())
                 .httpClient(ApacheHttpClient.builder()
-                        .maxConnections(100)        // Matches your Thread Pool size
-                        .connectionTimeout(Duration.ofMillis(2000)) // Fast fail on connection
+                        .maxConnections(100)
+                        .connectionTimeout(Duration.ofMillis(2000))
                         .build())
                 .build();
     }

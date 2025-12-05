@@ -18,15 +18,12 @@ public class CacheConfig {
 
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
-        // Default Configuration: 10 Seconds TTL
-        // This applies to roomHistory, userHistory, userRooms
         RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofSeconds(10))
                 .disableCachingNullValues();
 
-        // Optional: Specific configuration for Analytics if you want it longer
         Map<String, RedisCacheConfiguration> configMap = new HashMap<>();
-        configMap.put("analyticsCache", defaultConfig.entryTtl(Duration.ofSeconds(30))); // Keep analytics for 30s
+        configMap.put("analyticsCache", defaultConfig.entryTtl(Duration.ofSeconds(30)));
 
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(defaultConfig)

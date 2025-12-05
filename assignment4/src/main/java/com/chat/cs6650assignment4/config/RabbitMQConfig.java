@@ -22,7 +22,7 @@ public class RabbitMQConfig {
     private static final int NUMBER_OF_ROOMS = 20;
 
     private static final int MESSAGE_TTL_MS = 360000;
-    private static final int MAX_QUEUE_LENGTH = 10000;
+    private static final int MAX_QUEUE_LENGTH = 5000;
 
     @Bean
     public TopicExchange topicExchange() {
@@ -37,8 +37,8 @@ public class RabbitMQConfig {
             String queueName = QUEUE_NAME_PREFIX + i;
             String routingKey = ROUTING_KEY_PREFIX + i;
             Queue queue = QueueBuilder.durable(queueName)
-                    .withArgument("x-message-ttl", 360000)
-                    .withArgument("x-max-length", 5000)
+                    .withArgument("x-message-ttl", MESSAGE_TTL_MS)
+                    .withArgument("x-max-length", MAX_QUEUE_LENGTH)
                     .build();
             declarables.add(queue);
 

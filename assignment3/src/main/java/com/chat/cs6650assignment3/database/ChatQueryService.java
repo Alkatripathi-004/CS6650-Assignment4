@@ -35,6 +35,7 @@ public class ChatQueryService {
                 .keyConditionExpression("roomId = :pk AND timestampSk BETWEEN :start AND :end")
                 .expressionAttributeValues(eav)
                 .scanIndexForward(true)
+                .limit(100)
                 .build();
         return executeQuery(request);
     }
@@ -55,6 +56,7 @@ public class ChatQueryService {
                 .indexName(GSI_USER)
                 .keyConditionExpression(keyCondition.toString())
                 .expressionAttributeValues(eav)
+                .limit(100)
                 .build();
         return executeQuery(request);
     }
@@ -108,6 +110,7 @@ public class ChatQueryService {
             QueryRequest request = QueryRequest.builder()
                     .tableName(TABLE_NAME)
                     .indexName(GSI_TIME)
+                    .limit(50)
                     .keyConditionExpression("bucketId = :pk AND timestampSk BETWEEN :start AND :end")
                     .expressionAttributeValues(eav)
                     .build();

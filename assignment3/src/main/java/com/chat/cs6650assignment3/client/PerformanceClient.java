@@ -18,12 +18,12 @@ import java.util.stream.Collectors;
 
 public class PerformanceClient {
 
-    private static final String SERVER_WS_URL = "PLACEHOLDER_WS_URL";
-    private static final String SERVER_HTTP_URL = "PLACEHOLDER_HTTP_URL";
+    private static final String SERVER_WS_URL = "ws://chatApp-alb-841123983.us-east-1.elb.amazonaws.com/chat";
+    private static final String SERVER_HTTP_URL = "http://chatApp-alb-841123983.us-east-1.elb.amazonaws.com";
 
-    private static int NUM_THREADS = 256;
-    private static double RATE_LIMIT_PER_SECOND = 1000;
-    private static int TOTAL_MESSAGES = 1500000;
+    private static int NUM_THREADS = 64;
+    private static double RATE_LIMIT_PER_SECOND = 500;
+    private static int TOTAL_MESSAGES = 5000;
 
     public static final ChatMessage POISON_PILL = new ChatMessage();
     private static final int MESSAGE_QUEUE_CAPACITY = 30000;

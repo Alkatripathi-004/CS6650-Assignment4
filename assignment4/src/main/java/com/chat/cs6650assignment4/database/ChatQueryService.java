@@ -1,7 +1,6 @@
 package com.chat.cs6650assignment4.database;
 
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.*;
@@ -24,8 +23,6 @@ public class ChatQueryService {
         this.dynamoDbClient = dynamoDbClient;
     }
 
-    // === CHANGED: Added Caching ===
-    // Cache Key includes roomId + start + end to ensure uniqueness per query range
     @Cacheable(value = "roomHistory", key = "{#roomId, #start, #end}")
     public List<Map<String, String>> getRoomHistory(String roomId, String start, String end) {
         Map<String, AttributeValue> eav = new HashMap<>();
@@ -38,12 +35,11 @@ public class ChatQueryService {
                 .keyConditionExpression("roomId = :pk AND timestampSk BETWEEN :start AND :end")
                 .expressionAttributeValues(eav)
                 .scanIndexForward(true)
-                .limit(100) // Added limit for safety/performance
+                .limit(100)
                 .build();
         return executeQuery(request);
     }
 
-    // === CHANGED: Added Caching ===
     @Cacheable(value = "userHistory", key = "{#userId, #start, #end}")
     public List<Map<String, String>> getUserHistory(String userId, String start, String end) {
         Map<String, AttributeValue> eav = new HashMap<>();
@@ -66,7 +62,6 @@ public class ChatQueryService {
         return executeQuery(request);
     }
 
-    // === CHANGED: Added Caching ===
     @Cacheable(value = "userRooms", key = "#userId")
     public List<Map<String, String>> getRoomsForUser(String userId) {
 
@@ -89,22 +84,18 @@ public class ChatQueryService {
 
     @Cacheable(value = "analyticsCache", key = "{#start, #end}")
     public Map<String, Object> getAnalyticsInWindow(String start, String end) {
-        // SCATTER: Query 5 shards in parallel
         List<CompletableFuture<List<Map<String, AttributeValue>>>> futures = new ArrayList<>();
         for (int i = 0; i < NUM_SHARDS; i++) {
             futures.add(queryShardAsync(String.valueOf(i), start, end));
         }
 
-        // GATHER: Wait for all to finish (join)
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
-        // MERGE results
         List<Map<String, AttributeValue>> allItems = futures.stream()
                 .map(CompletableFuture::join)
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
 
-        // CALCULATE stats
         return calculateStats(allItems, start, end);
     }
 
@@ -159,9 +150,8 @@ public class ChatQueryService {
                     map.put(e.getKey(), e.getValue());
                     return map;
                 })
-                .collect(Collectors.toList()); // Use standard list
+                .collect(Collectors.toList());
 
-        // 2. Convert Top Rooms to simple List of Maps
         List<Map<String, Integer>> topRooms = roomCounts.entrySet().stream()
                 .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
                 .limit(5)
@@ -179,8 +169,8 @@ public class ChatQueryService {
         result.put("unique_active_users", uniqueUsers.size());
         result.put("total_messages_in_window", items.size());
         result.put("throughput_msg_per_sec", String.format("%.2f", throughput));
-        result.put("top_active_users", new ArrayList<>(topUsers)); // Wrap in ArrayList
-        result.put("top_active_rooms", new ArrayList<>(topRooms)); // Wrap in ArrayList
+        result.put("top_active_users", new ArrayList<>(topUsers));
+        result.put("top_active_rooms", new ArrayList<>(topRooms));
 
         return result;
     }

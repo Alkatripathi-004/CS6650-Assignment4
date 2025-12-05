@@ -7,7 +7,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/analytics")
@@ -26,7 +25,6 @@ public class MetricsController {
             @RequestParam(required = false) String end) {
 
         if (end == null) {
-            // Truncate to minutes (e.g., 10:05:00 instead of 10:05:23.456)
             end = Instant.now().truncatedTo(ChronoUnit.MINUTES).toString();
         }
         if (start == null) {
@@ -53,7 +51,6 @@ public class MetricsController {
             @RequestParam(required = false) String end) {
 
         if (end == null) {
-            // Truncate to minutes (e.g., 10:05:00 instead of 10:05:23.456)
             end = Instant.now().truncatedTo(ChronoUnit.MINUTES).toString();
         }
         if (start == null) {
@@ -81,7 +78,6 @@ public class MetricsController {
             @RequestParam(required = false) String end) {
 
         if (end == null) {
-            // Truncate to minutes (e.g., 10:05:00 instead of 10:05:23.456)
             end = Instant.now().truncatedTo(ChronoUnit.MINUTES).toString();
         }
         if (start == null) {
